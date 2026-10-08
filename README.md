@@ -58,6 +58,12 @@ Sends a job to the next Actor in line. Good default for work that doesn't care w
 
 Same key, same Actor, every time. Use it when one entity (an NPC, a player) should always be handled by the same worker.
 
+### `pool:SendBatch(topic, jobs, ...)`
+
+Splits the `jobs` list into one chunk per Actor and sends each chunk as a single message. Extra arguments are passed after the chunk. The worker handler receives `(chunk, ...)` and loops over it.
+
+Use this instead of calling `Send` in a loop. One message per Actor costs far less than one message per job, and you only need one `serial` call per chunk when results must be written back.
+
 ### `pool:Broadcast(topic, ...)`
 
 Sends the message to every Actor. Good for resets and config changes.
