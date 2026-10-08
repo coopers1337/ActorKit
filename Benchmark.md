@@ -193,16 +193,23 @@ Fill this in from the output window. The serial time will differ from Run 1 beca
 
 | Setup | Each (ms) | Each speedup | Batch (ms) | Batch speedup |
 | --- | --- | --- | --- | --- |
-| Serial | | x1.00 | | x1.00 |
-| Pool 1 | | | | |
-| Pool 4 | | | | |
-| Pool 16 | | | | |
-| Pool 64 | | | | |
+| Serial | 209.8 | x1.00 | 209.8 | x1.00 |
+| Pool 1 | 212.9 | x0.99 | 208.3 | x1.01 |
+| Pool 4 | 56.3 | x3.72 | 54.8 | x3.83 |
+| Pool 16 | 40.4 | x5.19 | 46.6 | x4.51 |
+| Pool 64 | 37.5 | x5.59 | 37.1 | x5.65 |
+
+What Run 2 showed:
+
+- **Native codegen helped.** Serial dropped from 251.7 ms to 209.8 ms, and Pool 64 dropped from 45.2 ms to about 37 ms.
+- **Batching made little difference at this job size.** Each job takes about 0.8 ms, so message cost is small next to the work. Pool 1 "each" is only 3 ms slower than serial across 256 messages.
+- **Pool 16 batch was slower than Pool 16 each** (46.6 ms vs 40.4 ms). This is a single run, so treat it as unexplained until repeated.
+- **The ceiling is the same as before.** Speedup tops out near x5.6 on 6 cores.
 
 ## How to read it
 
 - **Pool 1 each is about the same as serial, or slower.** One worker means no parallelism, and you pay for messaging. That is expected.
-- **Batch should beat each, most clearly at Pool 16 and Pool 64.** That is where the message count drops the most.
+- **Batch only helps when messages are a real part of the cost.** When each job is heavy, the work dominates and "each" and "batch" land within a few percent. Lower `ITERATIONS` to see the difference.
 - **Speedup grows, then flattens.** It stops near your CPU's core count. On a 6-core CPU, expect it to level off around x5 to x6 however many Actors you add.
 - **Compare Run 1 and Run 2 in milliseconds.** If serial time drops in Run 2, that is native codegen at work, and it speeds up every row.
 - **Studio numbers run lower than a live server.** Studio has extra overhead, so treat it as a rough guide.
