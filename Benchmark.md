@@ -138,7 +138,7 @@ end
 Fill this in from the output window.
 
 Machine: Intel Core i7-10750H (6 cores, 12 threads), 16 GB RAM  
-Where it ran: Studio / live server
+Where it ran: Studio
 
 | Setup | Time (ms) | Speedup |
 | --- | --- | --- |
