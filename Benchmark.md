@@ -137,16 +137,16 @@ end
 
 Fill this in from the output window.
 
-Machine: ______________________  
+Machine: Intel Core i7-10750H (6 cores, 12 threads), 16 GB RAM  
 Where it ran: Studio / live server
 
 | Setup | Time (ms) | Speedup |
 | --- | --- | --- |
-| Serial | | x1.00 |
-| Pool 1 | | |
-| Pool 4 | | |
-| Pool 16 | | |
-| Pool 64 | | |
+| Serial | 251.7 | x1.00 |
+| Pool 1 | 276.3 | x0.91 |
+| Pool 4 | 66.3 | x3.80 |
+| Pool 16 | 47.7 | x5.28 |
+| Pool 64 | 45.2 | x5.56 |
 
 ## How to read it
 
