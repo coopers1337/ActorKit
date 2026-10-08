@@ -45,7 +45,9 @@ One measured run on an Intel Core i7-10750H (6 cores), sending one message per j
 | Pool 16 | x5.28 |
 | Pool 64 | x5.56 |
 
-Pool 1 is slower than serial because of messaging cost, and the curve flattens near the 6-core limit. Batching and native codegen target exactly those two limits. See `Benchmark.md` to measure them yourself.
+Pool 1 is slower than serial because of messaging cost, and the curve flattens near the 6-core limit.
+
+With ActorKit v2 on the same machine, native codegen cut serial time from 251.7 ms to 209.8 ms and Pool 64 from 45.2 ms to about 37 ms. The speedup still topped out near x5.6. Batching changed little at that job size, because each job was heavy enough that message cost was small. It matters more when jobs are tiny. See `Benchmark.md` for the full results and to measure it yourself.
 
 Ways to get more speed, from biggest to smallest:
 
