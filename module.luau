@@ -10,6 +10,7 @@ export type Handler = (...any) -> ()
 
 type PoolState = {
 	actors: { Actor },
+	size: number,
 	cursor: number,
 }
 
@@ -36,17 +37,32 @@ function Pool.new(template: LuaSourceContainer, size: number, parent: Instance?)
 		actor.Parent = container
 		actors[index] = actor
 	end
-	return setmetatable({ actors = actors, cursor = 0 }, Pool)
+	return setmetatable({ actors = actors, size = size, cursor = 0 }, Pool)
 end
 
 function Pool.Send(self: Pool, topic: string, ...: any)
-	local cursor = self.cursor % #self.actors + 1
+	local cursor = self.cursor % self.size + 1
 	self.cursor = cursor
 	self.actors[cursor]:SendMessage(topic, ...)
 end
 
 function Pool.SendKeyed(self: Pool, key: number, topic: string, ...: any)
-	self.actors[math.floor(key) % #self.actors + 1]:SendMessage(topic, ...)
+	self.actors[math.floor(key) % self.size + 1]:SendMessage(topic, ...)
+end
+
+function Pool.SendBatch(self: Pool, topic: string, jobs: { any }, ...: any)
+	local base = #jobs // self.size
+	local extra = #jobs % self.size
+	local first = 1
+	for index = 1, self.size do
+		local count = base + (if index <= extra then 1 else 0)
+		if count == 0 then
+			break
+		end
+		local last = first + count - 1
+		self.actors[index]:SendMessage(topic, table.move(jobs, first, last, 1, table.create(count)), ...)
+		first = last + 1
+	end
 end
 
 function Pool.Broadcast(self: Pool, topic: string, ...: any)
@@ -68,6 +84,7 @@ function Pool.Destroy(self: Pool)
 		actor:Destroy()
 	end
 	table.clear(self.actors)
+	self.size = 0
 end
 
 local function serve(actor: Actor, handlers: { [string]: Handler }, parallel: boolean?): () -> ()
